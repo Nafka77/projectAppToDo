@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:p="http://primefaces.org/ui" xmlns:f="http://java.sun.com/jsf/core">
+    <h:head>
+        <meta charset="utf-8" />
+        <title>Strona główna - Aplikacja To-Do</title>
+    </h:head>
+    <h:body>
+
+        <!-- Panel powitalny -->
+        <p:panel header="Witaj, #{userController.loggedInUser.username}!" toggleable="true" style="margin-bottom: 1em;">
+            <h:outputText value="Zarządzaj swoimi zadaniami!" style="font-size: 18px;" />
+        </p:panel>
+
+        <!-- Przycisk do dodawania nowego zadania -->
+        <h:form>
+            <p:commandButton value="Dodaj nowe zadanie" action="addTask.xhtml?faces-redirect=true" />
+        </h:form>
+
+        <!-- Panel z listą zadań -->
+        <h:form>
+            <!-- p:dataTable z paginacją -->
+            <p:dataTable var="task" value="#{taskController.tasks}" paginator="true" rows="#{taskController.pageSize}" 
+                         currentPage="#{taskController.currentPage}" 
+                         rowsPerPageTemplate="5,10,15" id="tasksTable" styleClass="task-table">
+
+                <p:column headerText="Zadanie">
+                    <h:outputText value="#{task.title}" />
+                </p:column>
+
+                <p:column headerText="Priorytet">
+                    <h:outputText value="#{task.priority}" />
+                </p:column>
+
+<!--                 <p:column headerText="Status">
+                    Status ukończenia zadania - sprawdzenie w taskDetails
+                    <h:outputText value="#{taskController.getTaskStatus(task)}" />
+                </p:column>
+ -->
+                <!-- Akcje edytowania i usuwania zadania -->
+                <p:column headerText="Akcje">
+                    <h:form>
+                        <p:commandButton value="Edytuj" action="editTask.xhtml?faces-redirect=true">
+                            <f:param name="taskId" value="#{task.id}" />
+                        </p:commandButton>
+
+                        <p:commandButton value="Usuń" action="#{taskController.deleteTask(task.id)}" 
+                                         onclick="return confirm('Czy na pewno chcesz usunąć to zadanie?');" />
+                    </h:form>
+                </p:column>
+            </p:dataTable>
+
+            <!-- Paginacja i filtr -->
+            <h:outputLabel for="filterInput" value="Filtruj:" />
+            <p:inputText id="filterInput" value="#{taskController.filterKeyword}" placeholder="Wpisz frazę do wyszukania..." />
+
+            <p:commandButton value="Filtruj" action="#{taskController.filterTasks}" process="@form" update="tasksTable" />
+
+        </h:form>
+
+        <!-- Przycisk wylogowania -->
+        <h:form>
+            <p:commandButton value="Wyloguj się" action="#{userController.logout}" style="margin-top: 20px;" />
+        </h:form>
+
+    </h:body>
+</html>
+

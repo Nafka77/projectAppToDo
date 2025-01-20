@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<h:html xmlns:h="http://jakarta.ee/xml/ns/jakartaee" xmlns:f="http://jakarta.ee/xml/ns/jakartaee">
+    <h:head>
+        <title>Rejestracja</title>
+    </h:head>
+    <h:body>
+        <h1>Rejestracja użytkownika</h1>
+        
+        <!-- Formularz rejestracji -->
+        <h:form>
+            <h:outputLabel for="username" value="Nazwa użytkownika:" />
+            <h:inputText id="username" value="#{userController.username}" required="true" />
+            <h:message for="username" />
+
+            <h:outputLabel for="password" value="Hasło:" />
+            <h:inputSecret id="password" value="#{userController.password}" required="true" />
+            <h:message for="password" />
+
+            <h:outputLabel for="confirmPassword" value="Potwierdź hasło:" />
+            <h:inputSecret id="confirmPassword" value="#{userController.confirmPassword}" required="true" />
+            <h:message for="confirmPassword" />
+
+            <h:commandButton value="Zarejestruj się" action="#{userController.register}" />
+        </h:form>
+
+        <!-- Komunikat po udanej rejestracji -->
+        <h:messages globalOnly="true" />
+
+        <!-- Przycisk do logowania po udanej rejestracji -->
+        <h:form rendered="#{facesContext.maximumSeverity == null or facesContext.maximumSeverity eq 'INFO'}">
+            <h:commandButton value="Zaloguj się" action="login.xhtml?faces-redirect=true" />
+        </h:form>
+    </h:body>
+</h:html>

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+<h:head>
+    <meta charset="utf-8" />
+    <title>Zadania - Aplikacja To-Do</title>
+</h:head>
+
+<h:body style="background-color: #f0f0f0; margin: 1em;">
+    <p:panel header="Zadania" toggleable="true" style="margin-bottom: 1em;">
+        <h:form>
+            <h:panelGrid columns="2" cellpadding="5">
+                <h:outputLabel for="task" value="Zadanie:" />
+                <p:inputText id="task" value="#{taskController.taskDescription}" required="true" />
+
+                <h:outputLabel for="priority" value="Priorytet:" />
+                <p:selectOneMenu id="priority" value="#{taskController.priority}">
+                    <f:selectItem itemLabel="Wybierz priorytet" itemValue="" />
+                    <f:selectItem itemLabel="Wysoki" itemValue="wysoki" />
+                    <f:selectItem itemLabel="Średni" itemValue="średni" />
+                    <f:selectItem itemLabel="Niski" itemValue="niski" />
+                </p:selectOneMenu>
+
+                <h:outputLabel for="dueDate" value="Data wykonania:" />
+                <p:calendar id="dueDate" value="#{taskController.dueDate}" required="true" />
+            </h:panelGrid>
+
+            <p:commandButton value="Dodaj zadanie" action="#{taskController.addTask}" />
+        </h:form>
+
+        <h:form>
+            <p:dataTable value="#{taskController.tasks}" var="task">
+                <p:column headerText="Zadanie">
+                    <h:outputText value="#{task.description}" />
+                </p:column>
+
+                <p:column headerText="Priorytet">
+                    <h:outputText value="#{task.priority}" />
+                </p:column>
+
+                <p:column headerText="Data wykonania">
+                    <h:outputText value="#{task.dueDate}" />
+                </p:column>
+
+                <p:column headerText="Opcje">
+                    <p:commandButton value="Odhacz" action="#{taskController.markTaskAsDone(task)}" />
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </p:panel>
+</h:body>
+</html>
+

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <meta charset="utf-8" />
+        <title>Dodaj zadanie - Aplikacja To-Do</title>
+    </h:head>
+    <h:body>
+
+        <!-- Formularz dodawania zadania -->
+        <h:form>
+            <p:panel header="Dodaj nowe zadanie" style="width: 50%; margin: 0 auto;">
+
+                <!-- Zmiana z taskTitle na taskName (zgodnie z kontrolerem) -->
+                <h:outputLabel for="taskName" value="Nazwa zadania:" />
+                <p:inputText id="taskName" value="#{taskController.taskTitle}" required="true" />
+
+                <!-- Zmiana z taskPriority na priority -->
+                <h:outputLabel for="priority" value="Priorytet:" />
+                <p:inputText id="priority" value="#{taskController.priority}" required="true" />
+
+                <!-- Zmiana z createdAt na createdAt (dla daty utworzenia) -->
+                <h:outputLabel for="createdAt" value="Data utworzenia:" />
+                <p:calendar id="createdAt" value="#{taskController.createdAt}" required="true" />
+
+                <p:commandButton value="Dodaj zadanie" action="#{taskController.addTask}" styleClass="ui-button-success" />
+
+            </p:panel>
+        </h:form>
+
+    </h:body>
+</html>
+
