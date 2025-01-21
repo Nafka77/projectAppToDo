@@ -1,16 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<h:html xmlns:h="http://jakarta.ee/xml/ns/jakartaee" xmlns:f="http://jakarta.ee/xml/ns/jakartaee">
+<h:html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
     <h:head>
-        <title>Rejestracja</title>
+        <meta charset="utf-8" />
+        <title>Rejestracja użytkownika</title>
+        <h:outputStylesheet name="css/styles.css" />
     </h:head>
     <h:body>
         <h1>Rejestracja użytkownika</h1>
-        
+
         <!-- Formularz rejestracji -->
         <h:form>
             <h:outputLabel for="username" value="Nazwa użytkownika:" />
             <h:inputText id="username" value="#{userController.username}" required="true" />
             <h:message for="username" />
+
+            <h:outputLabel for="email" value="Adres e-mail:" />
+            <h:inputText id="email" value="#{userController.email}" required="true" />
+            <h:message for="email" />
 
             <h:outputLabel for="password" value="Hasło:" />
             <h:inputSecret id="password" value="#{userController.password}" required="true" />
@@ -32,3 +42,4 @@
         </h:form>
     </h:body>
 </h:html>
+

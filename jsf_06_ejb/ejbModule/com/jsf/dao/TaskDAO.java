@@ -12,7 +12,9 @@ public class TaskDAO {
 
     @PersistenceContext
     private EntityManager entityManager;
-
+    public void addTask(Task task) {
+        entityManager.persist(task); // Zapisanie zadania w bazie danych
+    }
     // Metoda do pobierania zadań z użytkownikiem z załadowanymi taskDetails
     public List<Task> getTasksByUserWithTaskDetails(User user) {
         return entityManager.createQuery(

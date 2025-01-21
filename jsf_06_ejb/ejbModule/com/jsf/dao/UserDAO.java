@@ -16,9 +16,10 @@ public class UserDAO {
     // Metoda do rejestracji użytkownika
     public void registerUser(User user) {
         try {
-            em.persist(user);  // Tworzymy nowego użytkownika w bazie
+            em.persist(user); // Zapisujemy użytkownika w bazie
         } catch (Exception e) {
-            throw new RuntimeException("Błąd rejestracji użytkownika", e);
+            // Dodano szczegółowe logowanie błędów
+            throw new RuntimeException("Błąd rejestracji użytkownika: " + e.getMessage(), e);
         }
     }
 
@@ -33,4 +34,5 @@ public class UserDAO {
         }
     }
 }
+
 

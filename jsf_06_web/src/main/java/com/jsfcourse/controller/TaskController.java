@@ -23,7 +23,6 @@ package com.jsfcourse.controller;
 
 import com.jsf.dao.TaskDAO;
 import com.jsf.entities.Task;
-import com.jsf.entities.TaskDetail;
 import com.jsf.entities.User;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
@@ -44,7 +43,7 @@ public class TaskController implements Serializable {
 
     private int pageSize = 10;  // Domyślna liczba zadań na stronie
     private int currentPage = 0;  // Domyślna strona
-    private String filterKeyword;  // Fraza do filtracji
+    private String filterKeyword = "";  // Fraza do filtracji (domyślnie pusta)
 
     // Getter i setter dla filterKeyword
     public String getFilterKeyword() {
@@ -73,11 +72,11 @@ public class TaskController implements Serializable {
         this.currentPage = currentPage;
     }
 
-    // Metoda do pobierania zadań z taskDetails (Eager Fetch)
+    // Metoda do pobierania zadań
     public List<Task> getTasks() {
         User loggedInUser = userController.getLoggedInUser();
         if (loggedInUser == null) {
-            return List.of();  // Użytkownik jest niezalogowany, zwracamy pustą listę
+            return List.of();  // Użytkownik niezalogowany, zwracamy pustą listę
         }
 
         if (filterKeyword == null || filterKeyword.trim().isEmpty()) {
@@ -87,11 +86,12 @@ public class TaskController implements Serializable {
         }
     }
 
-    // Metoda do filtrowania (np. resetowanie paginacji)
+    // Metoda do filtrowania
     public void filterTasks() {
-        currentPage = 0;  // Resetujemy stronę przy filtracji
+        currentPage = 0;  // Resetujemy stronę
     }
 }
+
 
 /*
  * // Metoda do pobierania statusu zadania w widoku public String

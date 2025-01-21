@@ -9,29 +9,41 @@
 <h:head>
     <meta charset="utf-8" />
     <title>Strona Główna - Aplikacja To-Do</title>
-    <h:outputStylesheet name="styles.css" />
+
+    <!-- Załadowanie stylów CSS -->
+    <h:outputStylesheet name="frontend/assets/css/main.css" />
+    <h:outputStylesheet name="frontend/assets/css/styles.css" />
 </h:head>
 
 <h:body style="background-color: #f4f7f9; font-family: Arial, sans-serif; color: #333; padding: 20px;">
 
-    <h:form>
-        <p:panel header="Strona Główna - Aplikacja To-Do" toggleable="true" styleClass="main-panel">
-        
-            <!-- Panel logowania -->
-            <h:panelGroup rendered="#{not userController.isLoggedIn()}">
-                <h2>Witaj na stronie głównej!</h2>
-                <h:commandButton value="Zaloguj się" action="login.xhtml?faces-redirect=true" styleClass="btn btn-primary" />
-                <h:commandButton value="Zarejestruj się" action="register.xhtml?faces-redirect=true" styleClass="btn btn-secondary" />
-            </h:panelGroup>
+    <p:panel header="Strona Główna - Aplikacja To-Do" toggleable="true" styleClass="main-panel">
 
-            <!-- Panel po zalogowaniu -->
-            <h:panelGroup rendered="#{userController.isLoggedIn()}">
-                <h2>Witaj, #{userController.loggedInUser.username}!</h2>
+        <!-- Panel logowania -->
+        <h:panelGroup rendered="#{not userController.isLoggedIn()}">
+            <h2>Zaloguj się</h2>
+            <h:form>
+                <h:commandButton value="Przejdź do logowania" action="login.xhtml?faces-redirect=true" styleClass="btn btn-primary" />
+            </h:form>
+        </h:panelGroup>
+
+        <!-- Panel rejestracji -->
+        <h:panelGroup rendered="#{not userController.isLoggedIn()}">
+            <h2>Zarejestruj się</h2>
+            <h:form>
+                <h:commandButton value="Przejdź do rejestracji" action="register.xhtml?faces-redirect=true" styleClass="btn btn-primary" />
+            </h:form>
+        </h:panelGroup>
+
+        <!-- Panel po zalogowaniu -->
+        <h:panelGroup rendered="#{userController.isLoggedIn()}">
+            <h2>Witaj, #{userController.loggedInUser.username}!</h2>
+            <h:form>
                 <h:commandButton value="Wyloguj się" action="#{userController.logout}" styleClass="btn btn-danger" />
-            </h:panelGroup>
+            </h:form>
+        </h:panelGroup>
 
-        </p:panel>
-    </h:form>
-
+    </p:panel>
 </h:body>
 </html>
+
