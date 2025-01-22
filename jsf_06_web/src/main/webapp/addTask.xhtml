@@ -1,31 +1,97 @@
+
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://jakarta.ee/xml/ns/jakartaee" xmlns:p="http://primefaces.org/ui">
-    <h:head>
-        <meta charset="utf-8" />
-        <title>Dodaj zadanie - Aplikacja To-Do</title>
-    </h:head>
-    <h:body>
+<html xmlns="http://www.w3.org/1999/xhtml" 
+      xmlns:h="http://java.sun.com/jsf/html" 
+      xmlns:p="http://primefaces.org/ui" 
+      xmlns:f="http://java.sun.com/jsf/core" 
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+<h:head>
+    <meta charset="utf-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <title>Dodaj zadanie - Aplikacja To-Do</title>
+    <h:outputStylesheet name="frontend/assets/css/main.css" />
+</h:head>
+<h:body class="is-preload">
 
-        <!-- Formularz dodawania zadania -->
-        <h:form>
-            <p:panel header="Dodaj nowe zadanie" style="width: 50%; margin: 0 auto;">
+    <!-- Wrapper -->
+    <div id="wrapper">
 
-                <!-- Zmiana z taskTitle na taskName (zgodnie z kontrolerem) -->
-                <h:outputLabel for="taskTitle" value="Nazwa zadania:" />
-                <p:inputText id="taskTitle" value="#{taskController.taskTitle}" required="true" />
+        <!-- Główna zawartość -->
+        <div id="main">
+            <div class="inner">
+            <header id="header">
+                        <a href="index.xhtml" class="logo">
+                            <strong>Aplikacja To-Do</strong>
+                        </a>
+                    </header>
+                <section class="box">
+                    <h2>Dodaj nowe zadanie</h2>
 
-                <!-- Priorytet -->
-                <h:outputLabel for="priority" value="Priorytet:" />
-                <p:inputText id="priority" value="#{taskController.priority}" required="true" />
+                    <!-- Komponent do wyświetlania komunikatów -->
+                    <p:growl id="messages" showDetail="true" />
 
-                <!-- Data utworzenia -->
-                <h:outputLabel for="createdAt" value="Data utworzenia:" />
-                <p:calendar id="createdAt" value="#{taskController.createdAt}" required="true" />
+                    <h:form id="taskForm" class="task-form">
+                        <h:messages globalOnly="true" style="color: red;" />
+                        <h:panelGrid columns="2" cellpadding="5" style="margin-bottom: 1em;">
+                            <!-- Tytuł zadania -->
+                            <h:outputLabel for="taskTitle" value="Tytuł zadania:" />
+                            <p:inputText id="taskTitle" value="#{taskController.task.title}" required="true" 
+                                         styleClass="form-input" />
 
-                <!-- Przycisk dodania zadania -->
-                <p:commandButton value="Dodaj zadanie" action="#{taskController.addTask}" styleClass="ui-button-success" />
-            </p:panel>
-        </h:form>
+                            <!-- Priorytet -->
+                            <h:outputLabel for="priority" value="Priorytet:" />
+                            <p:selectOneMenu id="priority" value="#{taskController.task.priority}" required="true" 
+                                             styleClass="form-input">
+                                <f:selectItem itemLabel="Wybierz priorytet" itemValue="" />
+                                <f:selectItems value="#{taskController.availablePriorities}" var="priority"
+                                               itemLabel="#{priority}" itemValue="#{priority}" />
+                            </p:selectOneMenu>
 
-    </h:body>
+                            <!-- Kategoria -->
+                            <h:outputLabel for="category" value="Kategoria:" />
+                            <p:selectOneMenu id="category" value="#{taskController.task.category}" required="true" 
+                                             styleClass="form-input">
+                                <f:selectItem itemLabel="Wybierz kategorię" itemValue="" />
+                                <f:selectItems value="#{taskController.availableCategories}" var="category"
+                                               itemLabel="#{category}" itemValue="#{category}" />
+                            </p:selectOneMenu>
+
+                            <!-- Opis zadania (w encji TaskDetail) -->
+                            <h:outputLabel for="taskDescription" value="Opis zadania:" />
+                            <p:inputTextarea id="taskDescription" value="#{taskController.taskDetail.description}" 
+                                             rows="5" required="true" styleClass="form-input" />
+                        </h:panelGrid>
+
+                        <!-- Przycisk dodawania zadania -->
+                        <p:commandButton value="Dodaj!" action="#{taskController.addTask}" 
+                                         styleClass="ui-button-success form-button" 
+                                         update="messages" />
+                    </h:form>
+                </section>
+            </div>
+        </div>
+  <!-- Sidebar - wczytujemy z pliku sidebar.xhtml -->
+            <ui:include src="sidebar.xhtml" />
+    </div>
+
+    <!-- Ukrycie tabeli -->
+    <h:panelGroup id="tasksTable" style="display: none;">
+        <p:dataTable value="#{taskController.tasks}" var="task">
+            <p:column headerText="Tytuł">
+                <h:outputText value="#{task.title}" />
+            </p:column>
+            <p:column headerText="Priorytet">
+                <h:outputText value="#{task.priority}" />
+            </p:column>
+        </p:dataTable>
+    </h:panelGroup>
+
+    <!-- Skrypty -->
+    <h:outputScript name="frontend/assets/js/jquery.min.js" />
+    <h:outputScript name="frontend/assets/js/browser.min.js" />
+    <h:outputScript name="frontend/assets/js/breakpoints.min.js" />
+    <h:outputScript name="frontend/assets/js/util.js" />
+    <h:outputScript name="frontend/assets/js/main.js" />
+
+</h:body>
 </html>

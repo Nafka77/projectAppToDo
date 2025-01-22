@@ -1,33 +1,18 @@
-/*
- * package com.jsf.dao;
- * 
- * import com.jsf.entities.Task; import com.jsf.entities.User; import
- * jakarta.persistence.EntityManager; import
- * jakarta.persistence.PersistenceContext; import
- * jakarta.persistence.TypedQuery; import java.util.List;
- * 
- * public class TaskDAO {
- * 
- * @PersistenceContext private EntityManager em;
- * 
- * // Zaktualizowana metoda z paginacją public List<Task> findTasksByUser(User
- * user, int page, int pageSize) { String query =
- * "SELECT t FROM Task t WHERE t.user = :user ORDER BY t.dueDate DESC";
- * TypedQuery<Task> typedQuery = em.createQuery(query, Task.class);
- * typedQuery.setParameter("user", user); typedQuery.setFirstResult(page *
- * pageSize); // set the offset for pagination
- * typedQuery.setMaxResults(pageSize); // set the page size return
- * typedQuery.getResultList(); } }
- */
 package com.jsfcourse.controller;
 
+import com.jsf.dao.CategoryDAO;
 import com.jsf.dao.TaskDAO;
+import com.jsf.dao.TaskDetailsDAO;
+import com.jsf.entities.Category;
 import com.jsf.entities.Task;
+import com.jsf.entities.TaskDetail;
 import com.jsf.entities.User;
-import jakarta.enterprise.context.RequestScoped;
+import jakarta.annotation.PostConstruct;
+import jakarta.faces.application.FacesMessage;
+import jakarta.faces.context.FacesContext;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
-
+import jakarta.enterprise.context.RequestScoped;
 import java.io.Serializable;
 import java.util.List;
 
@@ -41,20 +26,151 @@ public class TaskController implements Serializable {
     @Inject
     private UserController userController;
 
-    private int pageSize = 10;  // Domyślna liczba zadań na stronie
-    private int currentPage = 0;  // Domyślna strona
-    private String filterKeyword = "";  // Fraza do filtracji (domyślnie pusta)
+    @Inject
+    private CategoryDAO categoryDAO;
 
-    // Getter i setter dla filterKeyword
-    public String getFilterKeyword() {
-        return filterKeyword;
+    @Inject
+    private TaskDetailsDAO taskDetailsDAO;
+
+    private int pageSize = 7;
+    private int currentPage = 0;
+    private String filterKeyword = "";
+
+    private String taskTitle;
+    private String taskDescription;
+    private String selectedPriority;
+    private Category category;
+
+    private Task task;
+    private TaskDetail taskDetail; // Dodatkowy obiekt TaskDetail
+
+    private List<Category> availableCategories;
+    private List<String> availablePriorities;
+
+    @PostConstruct
+    public void init() {
+        task = new Task();
+        taskDetail = new TaskDetail(); // Inicjalizacja TaskDetail
+        availablePriorities = List.of("Low", "Medium", "High");
+        availableCategories = categoryDAO.getAllCategories();
     }
 
-    public void setFilterKeyword(String filterKeyword) {
-        this.filterKeyword = filterKeyword;
+    // Gettery i settery
+
+    public List<Task> getTasks() {
+        User loggedInUser = userController.getLoggedInUser();
+        if (loggedInUser == null) {
+            return List.of();
+        }
+        if (filterKeyword == null || filterKeyword.trim().isEmpty()) {
+            return taskDAO.getTasksByUserWithTaskDetails(loggedInUser);
+        } else {
+            return taskDAO.getTasksByUserWithPaginationAndFilter(loggedInUser, currentPage, pageSize, filterKeyword);
+        }
     }
 
-    // Getter i setter dla pageSize
+    // Dodawanie nowego zadania
+    public void addTask() {
+        User loggedInUser = userController.getLoggedInUser();
+        if (loggedInUser == null) {
+            FacesContext.getCurrentInstance().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Użytkownik niezalogowany.", null));
+            return;
+        }
+
+        if (taskTitle == null || taskTitle.isEmpty() || selectedPriority == null || category == null) {
+            FacesContext.getCurrentInstance().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Wszystkie pola są wymagane.", null));
+            return;
+        }
+
+        // Tworzenie zadania
+        Task newTask = new Task();
+        newTask.setTitle(taskTitle);
+        newTask.setPriority(selectedPriority);
+        newTask.setCreatedAt(new java.sql.Timestamp(System.currentTimeMillis()));
+        newTask.setUser(loggedInUser);
+        newTask.setCategory(category);
+
+        // Tworzenie szczegółów zadania
+        taskDetail.setDescription(taskDescription); // Dodanie opisu
+        taskDetail.setCreatedAt(new java.sql.Timestamp(System.currentTimeMillis()));
+        taskDetail.setDueDate(taskDetail.getDueDate()); // Przypisanie terminu
+        taskDetail.setCompleted((byte) 0); // Domyślny status - do wykonania
+        taskDetail.setTask(newTask); // Powiązanie szczegółów z zadaniem
+
+        // Zapisanie zadania i szczegółów
+        taskDAO.saveTask(newTask);
+        taskDetailsDAO.save(taskDetail);
+
+        // Resetowanie pól formularza
+        resetFormFields();
+
+        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Sukces", "Zadanie zostało dodane.");
+        FacesContext.getCurrentInstance().addMessage(null, message);
+    }
+
+    // Resetowanie pól formularza
+    private void resetFormFields() {
+        taskTitle = "";
+        selectedPriority = "";
+        category = null;
+        taskDescription = "";
+        taskDetail = new TaskDetail(); // Resetowanie obiektu TaskDetail
+    }
+
+    // Nowa metoda do zmiany statusu zadania
+    public void toggleTaskCompletion(int taskDetailId) {
+        TaskDetail taskDetail = taskDetailsDAO.findById(taskDetailId);
+        if (taskDetail != null) {
+            byte newStatus = (taskDetail.getCompleted() == 0) ? (byte) 1 : (byte) 0;
+            taskDetail.setCompleted(newStatus);
+            taskDetailsDAO.save(taskDetail);
+
+            String message = (newStatus == 1) ? "Zadanie zostało ukończone." : "Zadanie zostało oznaczone jako nieukończone.";
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Sukces", message));
+        } else {
+            FacesContext.getCurrentInstance().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Błąd", "Nie znaleziono szczegółów zadania."));
+        }
+    }
+
+    // Usuwanie zadania
+    public void deleteTask(Long taskId) {
+        User loggedInUser = userController.getLoggedInUser();
+
+        if (loggedInUser == null) {
+            FacesContext.getCurrentInstance().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Użytkownik niezalogowany.", null));
+            return;
+        }
+
+        try {
+            taskDAO.deleteTask(taskId);
+            FacesContext.getCurrentInstance().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_INFO, "Sukces", "Zadanie zostało usunięte."));
+        } catch (Exception e) {
+            FacesContext.getCurrentInstance().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Nie można usunąć zadania.", null));
+        }
+    }
+
+    // Filtrowanie zadań
+    public void filterTasks() {
+        currentPage = 0;
+    }
+
+    public void previousPage() {
+        if (currentPage > 0) {
+            currentPage--;
+        }
+    }
+
+    public void nextPage() {
+        currentPage++;
+    }
+
+    // Gettery i settery dla pól
     public int getPageSize() {
         return pageSize;
     }
@@ -63,7 +179,6 @@ public class TaskController implements Serializable {
         this.pageSize = pageSize;
     }
 
-    // Getter i setter dla currentPage
     public int getCurrentPage() {
         return currentPage;
     }
@@ -72,33 +187,75 @@ public class TaskController implements Serializable {
         this.currentPage = currentPage;
     }
 
-    // Metoda do pobierania zadań
-    public List<Task> getTasks() {
-        User loggedInUser = userController.getLoggedInUser();
-        if (loggedInUser == null) {
-            return List.of();  // Użytkownik niezalogowany, zwracamy pustą listę
-        }
-
-        if (filterKeyword == null || filterKeyword.trim().isEmpty()) {
-            return taskDAO.getTasksByUserWithTaskDetails(loggedInUser);
-        } else {
-            return taskDAO.getTasksByUserWithPaginationAndFilter(loggedInUser, currentPage, pageSize, filterKeyword);
-        }
+    public String getFilterKeyword() {
+        return filterKeyword;
     }
 
-    // Metoda do filtrowania
-    public void filterTasks() {
-        currentPage = 0;  // Resetujemy stronę
+    public void setFilterKeyword(String filterKeyword) {
+        this.filterKeyword = filterKeyword;
+    }
+
+    public String getTaskTitle() {
+        return taskTitle;
+    }
+
+    public void setTaskTitle(String taskTitle) {
+        this.taskTitle = taskTitle;
+    }
+
+    public String getTaskDescription() {
+        return taskDescription;
+    }
+
+    public void setTaskDescription(String taskDescription) {
+        this.taskDescription = taskDescription;
+    }
+
+    public String getSelectedPriority() {
+        return selectedPriority;
+    }
+
+    public void setSelectedPriority(String selectedPriority) {
+        this.selectedPriority = selectedPriority;
+    }
+
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
+    }
+
+    public List<Category> getAvailableCategories() {
+        return availableCategories;
+    }
+
+    public void setAvailableCategories(List<Category> availableCategories) {
+        this.availableCategories = availableCategories;
+    }
+
+    public List<String> getAvailablePriorities() {
+        return availablePriorities;
+    }
+
+    public void setAvailablePriorities(List<String> availablePriorities) {
+        this.availablePriorities = availablePriorities;
+    }
+
+    public Task getTask() {
+        return task;
+    }
+
+    public void setTask(Task task) {
+        this.task = task;
+    }
+
+    public TaskDetail getTaskDetail() {
+        return taskDetail;
+    }
+
+    public void setTaskDetail(TaskDetail taskDetail) {
+        this.taskDetail = taskDetail;
     }
 }
-
-
-/*
- * // Metoda do pobierania statusu zadania w widoku public String
- * getTaskStatus(Task task) { if (task.getTaskDetails() == null ||
- * task.getTaskDetails().isEmpty()) { return "Brak szczegółów"; } TaskDetail
- * firstDetail = task.getTaskDetails().get(0); return firstDetail.getCompleted()
- * == 1 ? "Ukończone" : "Nieukończone"; }
- * 
- * 
- */

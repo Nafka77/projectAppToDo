@@ -1,45 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<h:html xmlns="http://www.w3.org/1999/xhtml"
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:p="http://primefaces.org/ui"
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:f="http://xmlns.jcp.org/jsf/core">
-    <h:head>
-        <meta charset="utf-8" />
-        <title>Rejestracja użytkownika</title>
-        <h:outputStylesheet name="css/styles.css" />
-    </h:head>
-    <h:body>
-        <h1>Rejestracja użytkownika</h1>
 
-        <!-- Formularz rejestracji -->
-        <h:form>
-            <h:outputLabel for="username" value="Nazwa użytkownika:" />
-            <h:inputText id="username" value="#{userController.username}" required="true" />
-            <h:message for="username" />
+<h:head>
+    <meta charset="utf-8" />
+    <title>Rejestracja użytkownika</title>
+    <h:outputStylesheet name="css/styles.css" />
+</h:head>
 
-            <h:outputLabel for="email" value="Adres e-mail:" />
-            <h:inputText id="email" value="#{userController.email}" required="true" />
-            <h:message for="email" />
+<h:body style="background-color: #f0f0f0; margin: 1em;">
+    <p:panel header="Rejestracja użytkownika" toggleable="true" style="margin-bottom: 1em;">
+        <h:form id="registerForm">
+            <h:panelGrid columns="2" cellpadding="5">
+                <h:outputLabel for="username" value="Nazwa użytkownika:" />
+                <p:inputText id="username" value="#{userController.username}" required="true" label="Nazwa użytkownika"/>
+                <h:message for="username" style="color:red;"/>
 
-            <h:outputLabel for="password" value="Hasło:" />
-            <h:inputSecret id="password" value="#{userController.password}" required="true" />
-            <h:message for="password" />
+                <h:outputLabel for="email" value="Adres e-mail:" />
+                <p:inputText id="email" value="#{userController.email}" required="true" label="Adres e-mail"/>
+                <h:message for="email" style="color:red;"/>
 
-            <h:outputLabel for="confirmPassword" value="Potwierdź hasło:" />
-            <h:inputSecret id="confirmPassword" value="#{userController.confirmPassword}" required="true" />
-            <h:message for="confirmPassword" />
+                <h:outputLabel for="password" value="Hasło:" />
+                <p:password id="password" value="#{userController.password}" required="true" label="Hasło"/>
+                <h:message for="password" style="color:red;"/>
 
-            <h:commandButton value="Zarejestruj się" action="#{userController.register}" />
+                <h:outputLabel for="confirmPassword" value="Potwierdź hasło:" />
+                <p:password id="confirmPassword" value="#{userController.confirmPassword}" required="true" label="Potwierdź hasło"/>
+                <h:message for="confirmPassword" style="color:red;"/>
+            </h:panelGrid>
+
+            <!-- Przycisk rejestracji -->
+            <p:commandButton value="Zarejestruj się" action="#{userController.register}" ajax="false" update="messages" />
         </h:form>
 
-        <!-- Komunikat po udanej rejestracji -->
-        <h:messages globalOnly="true" />
+        <!-- Komunikaty o błędach rejestracji -->
+        <h:messages id="messages" globalOnly="true" style="color:green;" />
 
-        <!-- Przycisk do logowania po udanej rejestracji -->
-        <h:form rendered="#{facesContext.maximumSeverity == null or facesContext.maximumSeverity eq 'INFO'}">
-            <h:commandButton value="Zaloguj się" action="login.xhtml?faces-redirect=true" />
-        </h:form>
-    </h:body>
-</h:html>
+        <!-- Link do logowania -->
+        <div style="margin-top: 1em; text-align: center;">
+            <h:outputText value="Masz już konto?" />
+            <h:link value="Zaloguj się" outcome="login.xhtml" style="color: blue; text-decoration: underline;" />
+        </div>
+    </p:panel>
+</h:body>
+</html>
 

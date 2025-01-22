@@ -2,23 +2,31 @@
 <html xmlns="http://www.w3.org/1999/xhtml" 
       xmlns:h="http://java.sun.com/jsf/html" 
       xmlns:p="http://primefaces.org/ui" 
-      xmlns:f="http://java.sun.com/jsf/core">
+      xmlns:f="http://java.sun.com/jsf/core" 
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
     <h:head>
         <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
         <title>Strona główna - Aplikacja To-Do</title>
-        <!-- Szablon CSS -->
-        <h:outputStylesheet name="css/main.css" />
+        <h:outputStylesheet name="frontend/assets/css/main.css" />
     </h:head>
-    <h:body>
+    <h:body class="is-preload">
 
-        <!-- Wrapper z szablonu -->
+        <!-- Wrapper -->
         <div id="wrapper">
 
-            <!-- Main z szablonu -->
+            <!-- Main -->
             <div id="main">
                 <div class="inner">
 
-                    <!-- Komunikaty (sukcesy i błędy) -->
+                    <!-- Header -->
+                    <header id="header">
+                        <a href="index.xhtml" class="logo">
+                            <strong>Aplikacja To-Do</strong>
+                        </a>
+                    </header>
+
+                    <!-- Komunikaty -->
                     <p:messages id="messages" autoUpdate="true" />
 
                     <!-- Panel powitalny -->
@@ -26,61 +34,24 @@
                         <h:outputText value="Zarządzaj swoimi zadaniami!" style="font-size: 18px;" />
                     </p:panel>
 
-                    <!-- Przycisk do dodawania nowego zadania -->
-                    <h:form>
-                        <p:commandButton value="Dodaj nowe zadanie" action="addTask.xhtml?faces-redirect=true" styleClass="ui-button-success" />
-                    </h:form>
-
-                    <!-- Panel z listą zadań -->
-                    <h:form id="tasksForm">
-                        Filtr
-<h:outputLabel for="filterInput" value="Filtruj:" />
-<p:inputText id="filterInput" value="#{taskController.filterKeyword}" placeholder="Wpisz frazę do wyszukania..." />
-<p:commandButton value="Filtruj" action="#{taskController.filterTasks}" process="@form" update="tasksTable" />
-
-
-                        <!-- Tabela zadań -->
-                        <p:dataTable var="task" value="#{taskController.tasks}" paginator="true" rows="#{taskController.pageSize}" 
-                                     currentPageReportTemplate="Strona {currentPage} z {totalPages}" 
-                                     rowsPerPageTemplate="5,10,15" id="tasksTable" styleClass="task-table">
-
-                            <!-- Kolumna z tytułem -->
-                            <p:column headerText="Zadanie">
-                                <h:outputText value="#{task.title}" />
-                            </p:column>
-
-                            <!-- Kolumna z priorytetem -->
-                            <p:column headerText="Priorytet">
-                                <h:outputText value="#{task.priority}" />
-                            </p:column>
-
-                            <!-- Kolumna z datą utworzenia -->
-                            <p:column headerText="Data utworzenia">
-                                <h:outputText value="#{task.createdAt}" />
-                            </p:column>
-
-                            <!-- Kolumna z akcjami -->
-                            <p:column headerText="Akcje">
-                                <p:commandButton value="Edytuj" action="editTask.xhtml?faces-redirect=true">
-                                    <f:param name="taskId" value="#{task.id}" />
-                                </p:commandButton>
-                                <p:commandButton value="Usuń" action="#{taskController.deleteTask(task.id)}" 
-                                                 onclick="return confirm('Czy na pewno chcesz usunąć to zadanie?');" />
-                            </p:column>
-                        </p:dataTable>
-                    </h:form>
-
                     <!-- Przycisk wylogowania -->
                     <h:form>
-                        <p:commandButton value="Wyloguj się" action="#{userController.logout}" style="margin-top: 20px;" styleClass="ui-button-danger" />
+                        <p:commandButton value="Wyloguj się" action="#{userController.logout}" style="margin-top: 300px;" styleClass="ui-button-danger" />
                     </h:form>
 
                 </div>
             </div>
 
+  <!-- Sidebar - wczytujemy z pliku sidebar.xhtml -->
+            <ui:include src="sidebar.xhtml" />
         </div>
+
+        <!-- Dodanie skryptów JS -->
+        <h:outputScript name="frontend/assets/js/jquery.min.js" />
+        <h:outputScript name="frontend/assets/js/browser.min.js" />
+        <h:outputScript name="frontend/assets/js/breakpoints.min.js" />
+        <h:outputScript name="frontend/assets/js/util.js" />
+        <h:outputScript name="frontend/assets/js/main.js" />
 
     </h:body>
 </html>
-
-

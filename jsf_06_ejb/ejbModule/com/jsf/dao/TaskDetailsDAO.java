@@ -11,35 +11,35 @@ public class TaskDetailsDAO {
     @PersistenceContext
     private EntityManager entityManager;
 
-    // Metoda do zapisywania szczegółów zadania
-    public void save(TaskDetail taskDetails) {
-        entityManager.persist(taskDetails);
+    public void save(TaskDetail taskDetail) {
+        entityManager.persist(taskDetail);
     }
 
-    // Metoda do znajdowania szczegółów zadania po id
+    public TaskDetail findById(int id) {
+        return entityManager.find(TaskDetail.class, id);
+    }
+
     public TaskDetail findByTaskId(int taskId) {
         try {
             return entityManager.createQuery("SELECT td FROM TaskDetail td WHERE td.task.id = :taskId", TaskDetail.class)
                                 .setParameter("taskId", taskId)
                                 .getSingleResult();
         } catch (Exception e) {
-            // Możesz dodać logowanie błędu lub zwrócić null, jeśli zadanie nie istnieje
             return null;
         }
     }
 
-    // Metoda do aktualizacji szczegółów zadania
-    public void update(TaskDetail taskDetails) {
-        entityManager.merge(taskDetails);
+    public void delete(TaskDetail taskDetail) {
+        if (entityManager.contains(taskDetail)) {
+            entityManager.remove(taskDetail);
+        } else {
+            entityManager.remove(entityManager.merge(taskDetail));
+        }
     }
 
-    // Metoda do usuwania szczegółów zadania
-    public void delete(TaskDetail taskDetails) {
-        // Przed usunięciem upewniamy się, że taskDetails jest zarządzane
-        if (entityManager.contains(taskDetails)) {
-            entityManager.remove(taskDetails);
-        } else {
-            entityManager.remove(entityManager.merge(taskDetails));
-        }
+    public void deleteByTaskId(int taskId) {
+        entityManager.createQuery("DELETE FROM TaskDetail td WHERE td.task.id = :taskId")
+                     .setParameter("taskId", taskId)
+                     .executeUpdate();
     }
 }

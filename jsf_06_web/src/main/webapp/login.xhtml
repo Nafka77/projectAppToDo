@@ -14,18 +14,28 @@
 
 <h:body style="background-color: #f0f0f0; margin: 1em;">
     <p:panel header="Logowanie" toggleable="true" style="margin-bottom: 1em;">
-        <h:form>
+        <h:form id="loginForm">
             <h:panelGrid columns="2" cellpadding="5">
                 <h:outputLabel for="username" value="Nazwa użytkownika:" />
-                <p:inputText id="username" value="#{userController.username}" required="true" />
+                <p:inputText id="username" value="#{userController.username}" required="true" label="Nazwa użytkownika"/>
 
                 <h:outputLabel for="password" value="Hasło:" />
-                <p:password id="password" value="#{userController.password}" required="true" />
+                <p:password id="password" value="#{userController.password}" required="true" label="Hasło"/>
             </h:panelGrid>
 
-            <p:commandButton value="Zaloguj" action="#{userController.login}" />
-            <p:button value="Anuluj" outcome="index" />
+            <!-- Przycisk logowania -->
+            <p:commandButton value="Zaloguj" action="#{userController.login}" ajax="false" update="messages" />
         </h:form>
+
+        <!-- Komunikaty o błędach logowania -->
+        <h:messages id="messages" globalOnly="true" style="color:red;"/>
+
+        <!-- Link do rejestracji -->
+        <div style="margin-top: 1em; text-align: center;">
+            <h:outputText value="Nie masz jeszcze konta?" />
+            <h:link value="Zarejestruj się" outcome="register.xhtml" style="color: blue; text-decoration: underline;" />
+        </div>
     </p:panel>
 </h:body>
 </html>
+

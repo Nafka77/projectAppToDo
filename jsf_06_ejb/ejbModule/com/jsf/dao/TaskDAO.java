@@ -12,9 +12,24 @@ public class TaskDAO {
 
     @PersistenceContext
     private EntityManager entityManager;
-    public void addTask(Task task) {
-        entityManager.persist(task); // Zapisanie zadania w bazie danych
+
+    // Metoda do zapisywania zadania
+    public void saveTask(Task task) {
+        if (task.getId() == 0) {
+            entityManager.persist(task); // Zapisanie nowego zadania
+        } else {
+            entityManager.merge(task); // Aktualizacja istniejącego zadania
+        }
     }
+
+    // Metoda do usuwania zadania
+    public void deleteTask(Long taskId) {
+        Task task = entityManager.find(Task.class, taskId);
+        if (task != null) {
+            entityManager.remove(task);  // Usuń zadanie
+        }
+    }
+
     // Metoda do pobierania zadań z użytkownikiem z załadowanymi taskDetails
     public List<Task> getTasksByUserWithTaskDetails(User user) {
         return entityManager.createQuery(
@@ -23,7 +38,7 @@ public class TaskDAO {
             .getResultList();
     }
 
-    // Inna metoda z paginacją i filtracją (jeśli to potrzebne)
+    // Metoda z paginacją i filtracją
     public List<Task> getTasksByUserWithPaginationAndFilter(User user, int currentPage, int pageSize, String filterKeyword) {
         return entityManager.createQuery(
             "SELECT t FROM Task t LEFT JOIN FETCH t.taskDetails WHERE t.user = :user AND t.title LIKE :filter", Task.class)
