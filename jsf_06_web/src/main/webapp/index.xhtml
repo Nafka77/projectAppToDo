@@ -11,7 +11,6 @@
     <title>Strona Główna - Aplikacja To-Do</title>
 
     <h:outputStylesheet name="frontend/assets/css/main.css" />
-    <h:outputStylesheet name="frontend/assets/css/styles.css" />
 </h:head>
 
 <h:body style="background-color: #f4f7f9; font-family: Arial, sans-serif; color: #333; padding: 20px;">
@@ -38,7 +37,7 @@
         <h:panelGroup rendered="#{userController.isLoggedIn()}">
             <h2>Witaj, #{userController.loggedInUser.username}!</h2>
             <h:form>
-                <h:commandButton value="Wyloguj się" action="#{userController.logout}" styleClass="btn btn-danger" />
+                <h:commandButton value="Wyloguj się" action="#{userController.logout}" styleClass="btn btn-primary" />
             </h:form>
         </h:panelGroup>
 

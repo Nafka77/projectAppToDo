@@ -13,20 +13,26 @@ public class TaskDAO {
     @PersistenceContext
     private EntityManager entityManager;
 
-    // Metoda do zapisywania zadania
     public void saveTask(Task task) {
-        if (task.getId() == 0) {
-            entityManager.persist(task); // Zapisanie nowego zadania
+        // Zamiast porównywać z null, sprawdzamy, czy id jest równe 0
+        if (task.getId() != 0) {  // Jeśli id jest różne od 0, oznacza to, że zadanie istnieje w bazie
+            entityManager.merge(task);  // Używamy merge do aktualizacji istniejącego zadania
         } else {
-            entityManager.merge(task); // Aktualizacja istniejącego zadania
+            entityManager.persist(task);  // Jeśli id == 0, traktujemy zadanie jako nowe i zapisujemy je
         }
     }
 
-    // Metoda do usuwania zadania
-    public void deleteTask(Long taskId) {
-        Task task = entityManager.find(Task.class, taskId);
-        if (task != null) {
-            entityManager.remove(task);  // Usuń zadanie
+
+    public Task findTaskById(int id) {
+        return entityManager.find(Task.class, id);  // Używamy int jako parametr
+    }
+
+
+    public void deleteTask(Task task) {
+        if (entityManager.contains(task)) {
+            entityManager.remove(task);
+        } else {
+            entityManager.remove(entityManager.merge(task));
         }
     }
 
@@ -48,4 +54,14 @@ public class TaskDAO {
             .setMaxResults(pageSize)
             .getResultList();
     }
+    public void updateTask(Task task) {
+        // Sprawdzamy, czy task ma przypisane id (sprawdzamy, czy id != 0)
+        if (task.getId() != 0) {  // Jeśli id jest różne od 0, oznacza to, że zadanie już istnieje
+            entityManager.merge(task);  // Używamy merge do aktualizacji istniejącego zadania
+        } else {
+            entityManager.persist(task);  // Jeśli id == 0, traktujemy zadanie jako nowe i zapisujemy je
+        }
+    }
+
+
 }

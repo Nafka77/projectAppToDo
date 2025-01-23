@@ -37,7 +37,7 @@ public class TaskDetailsDAO {
         }
     }
 
-    public void deleteByTaskId(int taskId) {
+    public void deleteTaskDetailsByTaskId(int taskId) {
         entityManager.createQuery("DELETE FROM TaskDetail td WHERE td.task.id = :taskId")
                      .setParameter("taskId", taskId)
                      .executeUpdate();

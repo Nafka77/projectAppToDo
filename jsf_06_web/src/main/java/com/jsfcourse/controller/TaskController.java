@@ -15,6 +15,7 @@ import jakarta.inject.Named;
 import jakarta.enterprise.context.RequestScoped;
 import java.io.Serializable;
 import java.util.List;
+import java.util.Date;
 
 @Named
 @RequestScoped
@@ -46,16 +47,26 @@ public class TaskController implements Serializable {
 
     private List<Category> availableCategories;
     private List<String> availablePriorities;
+    private Date selectedDate;
 
     @PostConstruct
     public void init() {
         task = new Task();
         taskDetail = new TaskDetail(); // Inicjalizacja TaskDetail
+        selectedDate = new Date(); 
         availablePriorities = List.of("Low", "Medium", "High");
         availableCategories = categoryDAO.getAllCategories();
     }
 
     // Gettery i settery
+
+    public Date getSelectedDate() {
+        return selectedDate;
+    }
+
+    public void setSelectedDate(Date selectedDate) {
+        this.selectedDate = selectedDate;
+    }
 
     public List<Task> getTasks() {
         User loggedInUser = userController.getLoggedInUser();
@@ -136,7 +147,7 @@ public class TaskController implements Serializable {
     }
 
     // Usuwanie zadania
-    public void deleteTask(Long taskId) {
+    public void deleteTask(int taskId) {
         User loggedInUser = userController.getLoggedInUser();
 
         if (loggedInUser == null) {
@@ -146,14 +157,85 @@ public class TaskController implements Serializable {
         }
 
         try {
-            taskDAO.deleteTask(taskId);
+            // Znajdź zadanie do usunięcia
+            Task task = taskDAO.findTaskById((int) taskId);
+            if (task == null) {
+                FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Nie znaleziono zadania.", null));
+                return;
+            }
+
+            // Usuń szczegóły powiązane z zadaniem
+            taskDetailsDAO.deleteTaskDetailsByTaskId(taskId);
+
+            // Usuń samo zadanie
+            taskDAO.deleteTask(task);
+
             FacesContext.getCurrentInstance().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO, "Sukces", "Zadanie zostało usunięte."));
         } catch (Exception e) {
             FacesContext.getCurrentInstance().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Nie można usunąć zadania.", null));
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Błąd podczas usuwania zadania.", null));
         }
     }
+    
+
+    // Przekierowanie do edycji zadania
+ // W TaskController (lub innej klasie, która wywołuje tę metodę)
+    public String editTask(int taskId) {
+        System.out.println("Próba edycji zadania o ID: " + taskId);
+        task = taskDAO.findTaskById(taskId); 
+        if (task == null) {
+            System.out.println("Nie znaleziono zadania o podanym ID.");
+            FacesContext.getCurrentInstance().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Zadanie nie istnieje", null));
+            return null;
+        }
+        taskDetail = taskDetailsDAO.findByTaskId(taskId);
+        return "editTask.xhtml?faces-redirect=true&taskId=" + taskId;
+    }
+
+
+
+
+
+
+    public void saveTask() {
+        User loggedInUser = userController.getLoggedInUser();
+        if (loggedInUser == null) {
+            FacesContext.getCurrentInstance().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Użytkownik niezalogowany.", null));
+            return;
+        }
+
+        if (taskTitle == null || taskTitle.isEmpty() || selectedPriority == null || category == null) {
+            FacesContext.getCurrentInstance().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Wszystkie pola są wymagane.", null));
+            return;
+        }
+
+        // Ustawienie zaktualizowanych danych w obiekcie task
+        task.setTitle(taskTitle);
+        task.setPriority(selectedPriority);
+        task.setCategory(category);
+
+        // Ustawienie zaktualizowanych danych w obiekcie taskDetail
+        taskDetail.setDescription(taskDescription);
+        taskDetail.setDueDate(selectedDate);  // Ustawienie daty terminu
+
+        // Zapisanie zaktualizowanych danych w bazie
+        taskDAO.updateTask(task);  // Teraz wywołujemy updateTask zamiast saveTask
+        taskDetailsDAO.save(taskDetail);  // Zapisanie szczegółów zadania
+
+        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Sukces", "Zadanie zostało zaktualizowane.");
+        FacesContext.getCurrentInstance().addMessage(null, message);
+        
+        // Przekierowanie po zapisaniu
+        // Możesz dodać logikę, która przekieruje użytkownika po zapisaniu na listę zadań, jeśli chcesz.
+        // return "tasks.xhtml?faces-redirect=true"; 
+    }
+
+
 
     // Filtrowanie zadań
     public void filterTasks() {

@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
@@ -8,11 +9,10 @@
     <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
         <title>Profil użytkownika</title>
-        <meta charset="utf-8" />
         <h:outputStylesheet name="frontend/assets/css/main.css" />
+   
     </h:head>
-    <h:body>
-
+    <h:body style="background-color: #f4f7f9; font-family: Arial, sans-serif; color: #333; padding: 20px;">
 
         <!-- Wrapper -->
         <div id="wrapper">
@@ -47,8 +47,8 @@
                         </p:panelGrid>
 
                         <!-- Przyciski akcji -->
-                        <p:commandButton value="Zapisz zmiany" action="#{userController.updateProfile}" styleClass="ui-button-success" icon="pi pi-save" />
-                        <p:commandButton value="Anuluj" action="home.xhtml?faces-redirect=true" styleClass="ui-button-secondary" icon="pi pi-times" />
+                        <p:commandButton value="Zapisz zmiany" action="#{userController.updateProfile}" styleClass="btn btn-primary" />
+                        <p:commandButton value="Anuluj" action="home.xhtml?faces-redirect=true" styleClass="btn btn-primary" />
                     </h:form>
 
                 </div>

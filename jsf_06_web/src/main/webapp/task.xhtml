@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:p="http://primefaces.org/ui"
@@ -7,90 +8,108 @@
 
 <h:head>
     <meta charset="utf-8" />
-            <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
     <title>Zadania - Aplikacja To-Do</title>
     <h:outputStylesheet name="frontend/assets/css/main.css" />
-    <h:outputStylesheet name="frontend/assets/css/styles.css" />
 </h:head>
 
-  <h:body class="is-preload">
-   <!-- Wrapper -->
-        <div id="wrapper">
+<h:body class="is-preload">
+    <!-- Wrapper -->
+    <div id="wrapper">
 
-            <!-- Main -->
-            <div id="main">
-                <div class="inner">
+        <!-- Main -->
+        <div id="main">
+            <div class="inner">
 
-                    <!-- Header -->
-                    <header id="header">
-                        <a href="index.xhtml" class="logo">
-                            <strong>Aplikacja To-Do</strong>
-                        </a>
-                    </header>
-   <p:panel header="Lista zadań" toggleable="true" styleClass="main-panel">
+                <!-- Header -->
+                <header id="header">
+                    <a href="index.xhtml" class="logo">
+                        <strong>Aplikacja To-Do</strong>
+                    </a>
+                </header>
 
-        <h:form id="filterForm" style="margin-bottom: 1em;">
-            <h:outputLabel for="filterInput" value="Filtruj zadania:" style="margin-right: 10px;" />
-            <p:inputText id="filterInput" value="#{taskController.filterKeyword}" placeholder="Wpisz frazę..." style="margin-right: 10px;" />
-            <p:commandButton value="Filtruj" action="#{taskController.filterTasks}" process="@form" update="tasksTable" 
-                            styleClass="btn btn-primary"/>
-        </h:form>
+                <!-- Panel -->
+                <p:panel header="Lista zadań" toggleable="true" styleClass="main-panel">
+                    <!-- Filter Form -->
+                    <h:form id="filterForm" style="margin-bottom: 1em;">
+                        <h:outputLabel for="filterInput" value="Filtruj zadania:" style="margin-right: 10px;" />
+                        <p:inputText id="filterInput" value="#{taskController.filterKeyword}" placeholder="Wpisz frazę..." style="margin-right: 10px;" />
+                        <p:commandButton value="Filtruj" action="#{taskController.filterTasks}" process="@form" update="tasksTable" styleClass="btn btn-primary" />
+                    </h:form>
 
-        <p:dataTable id="tasksTable" var="task" value="#{taskController.getTasks()}" 
-                     paginator="true" rows="5" 
-                     currentPageReportTemplate="Strona {currentPage} z {totalPages}" 
-                     rowsPerPageTemplate="5,10,15" 
-                     styleClass="task-table" style="margin-top: 1em;">
-            <p:column headerText="Zadanie" style="text-align: left;">
-                <h:outputText value="#{task.title}" />
-            </p:column>
+                    <!-- Tasks Table -->
+                   <p:dataTable id="tasksTable" var="task" value="#{taskController.getTasks()}" 
+             paginator="true" rows="5" 
+             currentPageReportTemplate="Strona {currentPage} z {totalPages}" 
+             rowsPerPageTemplate="5,10,15" 
+             styleClass="task-table" style="margin-top: 1em;">
 
-            <p:column headerText="Priorytet" style="text-align: center;">
-                <h:outputText value="#{task.priority}" />
-            </p:column>
+    <!-- Task Title Column -->
+    <p:column headerText="Zadanie" style="text-align: left;">
+        <h:outputText value="#{task.title}" />
+    </p:column>
 
-            <p:column headerText="Opis" style="text-align: left;">
-                <ui:repeat value="#{task.taskDetails}" var="taskDetail">
-                    <h:outputText value="#{taskDetail.description}" /><br />
-                </ui:repeat>
-            </p:column>
+    <!-- Priority Column -->
+    <p:column headerText="Priorytet" style="text-align: center;">
+        <h:outputText value="#{task.priority}" />
+    </p:column>
 
-            <p:column headerText="Status" style="text-align: center;">
-                <p:selectBooleanCheckbox value="#{taskDetail.completed == 1}" 
-                                         onchange="PF('statusDialog').show();">
-                    <f:ajax event="change" listener="#{taskController.toggleTaskCompletion(task.id)}" render="tasksTable" />
-                </p:selectBooleanCheckbox>
-            </p:column>
+    <!-- Description Column -->
+    <p:column headerText="Opis" style="text-align: left;">
+        <ui:repeat value="#{task.taskDetails}" var="taskDetail">
+            <h:outputText value="#{taskDetail.description}" /><br />
+        </ui:repeat>
+    </p:column>
 
-            <p:column headerText="Akcje" style="text-align: center;">
-                <p:commandButton value="Edytuj" action="editTask.xhtml?faces-redirect=true" 
-                                 styleClass="btn btn-primary" icon="pi pi-pencil">
-                    <f:param name="taskId" value="#{task.id}" />
-                </p:commandButton>
-                <p:commandButton value="Usuń" action="#{taskController.deleteTask(task.id)}" 
-                                 onclick="return confirm('Czy na pewno chcesz usunąć to zadanie?');" 
-                                 update="tasksTable" styleClass="btn btn-primary" icon="pi pi-trash" />
-            </p:column>
-        </p:dataTable>
+    <!-- Status Column -->
+    <p:column headerText="Status" style="text-align: center;">
+        <p:selectBooleanCheckbox value="#{taskDetail.completed}"
 
-        <div style="margin-top: 1em; text-align: right;">
-            <p:commandButton value="Dodaj nowe zadanie" action="addTask.xhtml?faces-redirect=true" 
-                             styleClass="btn btn-primary" icon="pi pi-plus" />
-        </div>
+                                 onchange="PF('statusDialog').show();">
+            <f:ajax event="change" listener="#{taskController.toggleTaskCompletion(task.id)}" render="tasksTable" />
+        </p:selectBooleanCheckbox>
+    </p:column>
 
-    </p:panel>
-      </div>
+    <!-- Kolumna z przyciskiem Usuń -->
+    <p:column headerText="Akcja Usuń" style="text-align: center;">
+        <p:commandButton value="Usuń" 
+                         actionListener="#{taskController.deleteTask(task.id)}" 
+                         onclick="return confirm('Czy na pewno chcesz usunąć to zadanie?');" 
+                         update="tasksTable" 
+                         styleClass="btn btn-danger" 
+                         icon="pi pi-trash" />
+    </p:column>
+
+    <!-- Kolumna z przyciskiem Edytuj -->
+<p:column headerText="Akcja Edytuj" style="text-align: center;">
+    <p:commandButton value="Edytuj" 
+                     action="#{taskController.editTask(task.id)}"
+                     styleClass="btn btn-secondary" 
+                     icon="pi pi-pencil" />
+</p:column>
+ 
+
+                    </p:dataTable>
+
+                    <!-- Add Task Button -->
+                    <div style="margin-top: 1em; text-align: right;">
+                        <p:commandButton value="Dodaj nowe zadanie" action="addTask.xhtml?faces-redirect=true" 
+                                         styleClass="btn btn-primary" icon="pi pi-plus" />
+                    </div>
+
+                </p:panel>
             </div>
-      <!-- Sidebar - wczytujemy z pliku sidebar.xhtml -->
-            <ui:include src="sidebar.xhtml" />
         </div>
-     <!-- Dodanie skryptów JS -->
-        <h:outputScript name="frontend/assets/js/jquery.min.js" />
-        <h:outputScript name="frontend/assets/js/browser.min.js" />
-        <h:outputScript name="frontend/assets/js/breakpoints.min.js" />
-        <h:outputScript name="frontend/assets/js/util.js" />
-        <h:outputScript name="frontend/assets/js/main.js" />
 
-    </h:body>
+        <!-- Sidebar -->
+        <ui:include src="sidebar.xhtml" />
+    </div>
+
+    <!-- Scripts -->
+    <h:outputScript name="frontend/assets/js/jquery.min.js" />
+    <h:outputScript name="frontend/assets/js/browser.min.js" />
+    <h:outputScript name="frontend/assets/js/breakpoints.min.js" />
+    <h:outputScript name="frontend/assets/js/util.js" />
+    <h:outputScript name="frontend/assets/js/main.js" />
+</h:body>
 </html>
-
