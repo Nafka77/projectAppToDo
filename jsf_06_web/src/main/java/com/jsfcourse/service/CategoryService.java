@@ -14,11 +14,11 @@ public class CategoryService {
 
     // Metoda do pobierania wszystkich kategorii
     public List<Category> findAllCategories() {
-        return categoryDAO.findAll();
+        return categoryDAO.getAllCategories();
     }
 
     // Metoda do pobierania kategorii po ID
     public Category findCategoryById(int id) {
         return categoryDAO.findById(id);
     }
-}
+} 

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <h:head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+        <title>Panel Admina</title>
+        <h:outputStylesheet name="frontend/assets/css/main.css" />
+    </h:head>
+    <h:body class="is-preload">
+
+        <!-- Wrapper -->
+        <div id="wrapper">
+            <div id="main" > 
+             <!-- Header -->
+                <header id="header">
+                    <a href="index.xhtml" class="logo">
+                        <strong>Panel Admina</strong>
+                    </a>
+                </header>
+
+                <!-- Panel -->
+                <p:panel header="Lista uzytkownikow" toggleable="true" styleClass="main-panel">
+                <h:form>
+                    <!-- Filtruj użytkowników -->
+                    <h:outputLabel for="filterInput" value="Filtruj użytkowników:" style="margin-right: 10px;" />
+                    <p:inputText id="filterInput" value="#{userController.filterKeyword}" placeholder="Wpisz frazę..." 
+                                 style="width: 200px; margin-right: 10px;"/>
+                    <p:commandButton value="Filtruj" action="#{userController.filterUsers}" update="userTable" styleClass="primary" />
+
+                    <!-- Tabela użytkowników -->
+                   <p:dataTable id="userTable" var="user" value="#{userController.getFilteredUsers()}"
+             paginator="true" rows="10" paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}">
+
+    <!-- Kolumna z nazwą użytkownika -->
+    <p:column headerText="Nazwa użytkownika" style="text-align: left;">
+        <h:outputText value="#{user.username}" />
+    </p:column>
+
+    <!-- Kolumna z e-mailem -->
+    <p:column headerText="E-mail" style="text-align: left;">
+        <h:outputText value="#{user.email}" />
+    </p:column>
+
+    <!-- Kolumna z rolą -->
+    <p:column headerText="Rola" style="text-align: center;">
+        <h:outputText value="#{user.role}" />
+    </p:column>
+
+    <!-- Kolumna z przyciskiem usuwania -->
+    <p:column headerText="Akcje">
+        <p:commandButton value="Usuń" action="#{userController.deleteUser(user)}" 
+                         update="userTable" styleClass="primary"
+                         onclick="return confirm('Czy na pewno chcesz usunąć tego użytkownika?');" />
+    </p:column>
+</p:dataTable>
+
+                </h:form>
+   </p:panel>
+            </div>
+
+            <!-- Sidebar -->
+            <ui:include src="sidebar.xhtml" />
+        </div>
+
+        <!-- Skrypty JS -->
+        <h:outputScript name="frontend/assets/js/jquery.min.js" />
+        <h:outputScript name="frontend/assets/js/browser.min.js" />
+        <h:outputScript name="frontend/assets/js/breakpoints.min.js" />
+        <h:outputScript name="frontend/assets/js/util.js" />
+        <h:outputScript name="frontend/assets/js/main.js" />
+    </h:body>
+</html>

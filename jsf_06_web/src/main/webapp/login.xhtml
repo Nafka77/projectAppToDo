@@ -9,7 +9,7 @@
 <h:head>
     <meta charset="utf-8" />
     <title>Logowanie - Aplikacja To-Do</title>
-    <h:outputStylesheet name="css/styles.css" />
+        <h:outputStylesheet name="frontend/assets/css/main.css" />
 </h:head>
 
 <h:body style="background-color: #f0f0f0; margin: 1em;">
@@ -24,7 +24,7 @@
             </h:panelGrid>
 
             <!-- Przycisk logowania -->
-            <p:commandButton value="Zaloguj" action="#{userController.login}" ajax="false" update="messages" />
+            <p:commandButton value="Zaloguj" action="#{userController.login}" ajax="false" update="messages"  styleClass="primary" />
         </h:form>
 
         <!-- Komunikaty o błędach logowania -->

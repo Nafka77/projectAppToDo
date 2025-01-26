@@ -34,17 +34,30 @@
                         <h:outputText value="Zarządzaj swoimi zadaniami!" style="font-size: 18px;" />
                     </p:panel>
 
-                    <!-- Przycisk wylogowania -->
+                    
+
+<!-- Kontener na przycisk Panel administratora -->
+<div style="margin-top: 250px; margin-bottom: 10px;">
+    <!-- Przycisk do panelu admina widoczny tylko dla adminów -->
+    <h:panelGroup rendered="#{userController.admin}">
+        <h:form>
+            <p:commandButton value="Panel administratora" action="adminPanel.xhtml?faces-redirect=true" 
+                             styleClass="primary" />
+        </h:form>
+    </h:panelGroup>
+</div>
+
+<!-- Przycisk wylogowania -->
                     <h:form>
-                        <p:commandButton value="Wyloguj się" action="#{userController.logout}" style="margin-top: 300px;" styleClass="ui-button-danger" />
+                        <p:commandButton value="Wyloguj się" action="#{userController.logout}" style="margin-top: 30px;" styleClass="primary" />
                     </h:form>
 
                 </div>
             </div>
 
-  <!-- Sidebar - wczytujemy z pliku sidebar.xhtml -->
+            <!-- Sidebar - wczytujemy z pliku sidebar.xhtml -->
             <ui:include src="sidebar.xhtml" />
-        </div>
+        </div>a
 
         <!-- Dodanie skryptów JS -->
         <h:outputScript name="frontend/assets/js/jquery.min.js" />

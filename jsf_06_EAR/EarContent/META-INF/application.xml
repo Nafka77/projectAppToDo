@@ -7,7 +7,7 @@
 	<module>
     <web>
       <web-uri>jsf_06_web.war</web-uri>
-      <context-root>people</context-root>
+      <context-root>apptodo</context-root>
     </web>
   </module>
   <module>

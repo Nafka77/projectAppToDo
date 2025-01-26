@@ -29,20 +29,24 @@ public class TaskDAO {
 
 
     public void deleteTask(Task task) {
-        if (entityManager.contains(task)) {
-            entityManager.remove(task);
-        } else {
-            entityManager.remove(entityManager.merge(task));
+        // Sprawdź, czy task nie jest null
+        if (task != null) {
+            task = entityManager.find(Task.class, task.getId());  // Znajdź zadanie w bazie
+            if (task != null) {
+                entityManager.remove(task);  // Usuwamy zadanie z bazy danych
+            }
         }
     }
+    
 
     // Metoda do pobierania zadań z użytkownikiem z załadowanymi taskDetails
     public List<Task> getTasksByUserWithTaskDetails(User user) {
-        return entityManager.createQuery(
-            "SELECT t FROM Task t LEFT JOIN FETCH t.taskDetails WHERE t.user = :user", Task.class)
-            .setParameter("user", user)
-            .getResultList();
+        String jpql = "SELECT t FROM Task t LEFT JOIN FETCH t.category WHERE t.user = :user";
+        return entityManager.createQuery(jpql, Task.class)
+                            .setParameter("user", user)
+                            .getResultList();
     }
+
 
     // Metoda z paginacją i filtracją
     public List<Task> getTasksByUserWithPaginationAndFilter(User user, int currentPage, int pageSize, String filterKeyword) {

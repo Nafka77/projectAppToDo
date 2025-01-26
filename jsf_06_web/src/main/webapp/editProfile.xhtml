@@ -5,64 +5,85 @@
       xmlns:p="http://primefaces.org/ui"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
-    <h:head>
+<h:head>
     <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-        <title>Profil użytkownika</title>
-        <h:outputStylesheet name="frontend/assets/css/main.css" />
-   
-    </h:head>
-    <h:body style="background-color: #f4f7f9; font-family: Arial, sans-serif; color: #333; padding: 20px;">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <title>Profil użytkownika</title>
+    <h:outputStylesheet name="frontend/assets/css/main.css" />
+</h:head>
+<h:body style="background-color: #f4f7f9; font-family: Arial, sans-serif; color: #333; padding: 20px;">
 
-        <!-- Wrapper -->
-        <div id="wrapper">
-            <div id="main">
-                <div class="inner">
+    <!-- Wrapper -->
+    <div id="wrapper">
+        <div id="main">
+            <div class="inner">
                 <!-- Header -->
-                    <header id="header">
-                        <a href="index.xhtml" class="logo">
-                            <strong>Aplikacja To-Do</strong>
-                        </a>
-                    </header>
+                <header id="header">
+                    <a href="index.xhtml" class="logo">
+                        <strong>Aplikacja To-Do</strong>
+                    </a>
+                </header>
 
-                    <!-- Nagłówek -->
-                    <h1>Profil użytkownika</h1>
-                    <p:messages id="messages" autoUpdate="true" />
+                <!-- Nagłówek -->
+                <h2 style="text-align: center; font-size: 24px; margin-bottom: 20px;">Edycja Profilu</h2>
+                <p:messages id="messages" autoUpdate="true" style="margin-bottom: 20px;" />
 
-                    <!-- Formularz profilu -->
-                    <h:form>
-                        <p:panelGrid columns="2" style="width: 100%;" columnClasses="label,value">
+                <!-- Formularz -->
+                <h:form id="profileForm" style="width: 60%; margin: 0 auto; background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+                    <div class="row gtr-uniform">
+                        <!-- Nazwa użytkownika -->
+                        <div class="col-12">
+                            <h:outputLabel for="username" value="Nazwa użytkownika:" style="font-size: 14px; margin-bottom: 5px;" />
+                            <h:outputText id="username" value="#{userController.loggedInUser.username}" style="display: block; font-size: 16px; font-weight: bold; padding: 10px 0;" />
+                        </div>
 
-                            <p:outputLabel for="username" value="Nazwa użytkownika:" />
-                            <h:outputText id="username" value="#{userController.loggedInUser.username}" />
+                        <!-- E-mail -->
+                        <div class="col-12">
+                            <h:outputLabel for="email" value="E-mail:" style="font-size: 14px; margin-bottom: 5px;" />
+                            <p:inputText id="email" value="#{userController.email}" 
+                                         styleClass="form-input" style="width: 100%;" placeholder="Wpisz swój e-mail" />
+                        </div>
 
-                            <p:outputLabel for="email" value="E-mail:" />
-                            <p:inputText id="email" value="#{userController.email}" />
+                        <!-- Nowe hasło -->
+                        <div class="col-12">
+                            <h:outputLabel for="newPassword" value="Nowe hasło:" style="font-size: 14px; margin-bottom: 5px;" />
+                            <p:password id="newPassword" value="#{userController.newPassword}" 
+                                        styleClass="form-input" style="width: 100%;" placeholder="Wpisz nowe hasło" />
+                        </div>
 
-                            <p:outputLabel for="newPassword" value="Nowe hasło:" />
-                            <p:password id="newPassword" value="#{userController.newPassword}" />
+                        <!-- Potwierdź nowe hasło -->
+                        <div class="col-12">
+                            <h:outputLabel for="confirmNewPassword" value="Potwierdź nowe hasło:" style="font-size: 14px; margin-bottom: 5px;" />
+                            <p:password id="confirmNewPassword" value="#{userController.confirmNewPassword}" 
+                                        styleClass="form-input" style="width: 100%;" placeholder="Potwierdź nowe hasło" />
+                        </div>
 
-                            <p:outputLabel for="confirmNewPassword" value="Potwierdź nowe hasło:" />
-                            <p:password id="confirmNewPassword" value="#{userController.confirmNewPassword}" />
-                        </p:panelGrid>
-
-                        <!-- Przyciski akcji -->
-                        <p:commandButton value="Zapisz zmiany" action="#{userController.updateProfile}" styleClass="btn btn-primary" />
-                        <p:commandButton value="Anuluj" action="home.xhtml?faces-redirect=true" styleClass="btn btn-primary" />
-                    </h:form>
-
-                </div>
+                        <!-- Przycisk zapisu -->
+                        <div class="col-12">
+                            <ul class="actions">
+                                <li>
+                                    <p:commandButton value="Zapisz zmiany" action="#{userController.updateProfile}" 
+                                                     styleClass="primary" style="width: 100%;" update="messages" />
+                                </li>
+                                <li>
+                                    <p:commandButton value="Anuluj" action="home.xhtml?faces-redirect=true" 
+                                                     styleClass="primary" style="width: 100%;" />
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </h:form>
             </div>
-                        <ui:include src="sidebar.xhtml" />
         </div>
+        <ui:include src="sidebar.xhtml" />
+    </div>
 
+    <!-- Skrypty -->
+    <h:outputScript name="frontend/assets/js/jquery.min.js" />
+    <h:outputScript name="frontend/assets/js/browser.min.js" />
+    <h:outputScript name="frontend/assets/js/breakpoints.min.js" />
+    <h:outputScript name="frontend/assets/js/util.js" />
+    <h:outputScript name="frontend/assets/js/main.js" />
 
-        <!-- Dodanie skryptów JS -->
-        <h:outputScript name="frontend/assets/js/jquery.min.js" />
-        <h:outputScript name="frontend/assets/js/browser.min.js" />
-        <h:outputScript name="frontend/assets/js/breakpoints.min.js" />
-        <h:outputScript name="frontend/assets/js/util.js" />
-        <h:outputScript name="frontend/assets/js/main.js" />
-
-    </h:body>
+</h:body>
 </html>

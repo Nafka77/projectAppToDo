@@ -34,67 +34,80 @@
                     <h:form id="filterForm" style="margin-bottom: 1em;">
                         <h:outputLabel for="filterInput" value="Filtruj zadania:" style="margin-right: 10px;" />
                         <p:inputText id="filterInput" value="#{taskController.filterKeyword}" placeholder="Wpisz frazę..." style="margin-right: 10px;" />
-                        <p:commandButton value="Filtruj" action="#{taskController.filterTasks}" process="@form" update="tasksTable" styleClass="btn btn-primary" />
+                        <p:commandButton value="Filtruj" action="#{taskController.filterTasks}" process="@form" update="tasksTable" styleClass="primary" />
                     </h:form>
 
                     <!-- Tasks Table -->
-                   <p:dataTable id="tasksTable" var="task" value="#{taskController.getTasks()}" 
-             paginator="true" rows="5" 
-             currentPageReportTemplate="Strona {currentPage} z {totalPages}" 
-             rowsPerPageTemplate="5,10,15" 
-             styleClass="task-table" style="margin-top: 1em;">
+                    <p:dataTable id="tasksTable" var="task" value="#{taskController.getTasks()}"
+                                 paginator="true" rows="5" 
+                                 sortBy="#{task.completed}" sortOrder="ascending" 
+                                 currentPageReportTemplate="Strona {currentPage} z {totalPages}" 
+                                 rowsPerPageTemplate="5,10,15" 
+                                 styleClass="task-table" style="margin-top: 1em;">
 
-    <!-- Task Title Column -->
-    <p:column headerText="Zadanie" style="text-align: left;">
-        <h:outputText value="#{task.title}" />
-    </p:column>
+                        <!-- Task Title Column -->
+                        <p:column headerText="Zadanie" style="text-align: left;">
+                            <h:outputText value="#{task.title}" />
+                        </p:column>
 
-    <!-- Priority Column -->
-    <p:column headerText="Priorytet" style="text-align: center;">
-        <h:outputText value="#{task.priority}" />
-    </p:column>
+                        <!-- Priority Column -->
+                        <p:column headerText="Priorytet" style="text-align: center;">
+                            <h:outputText value="#{task.priority}" />
+                        </p:column>
 
-    <!-- Description Column -->
-    <p:column headerText="Opis" style="text-align: left;">
-        <ui:repeat value="#{task.taskDetails}" var="taskDetail">
-            <h:outputText value="#{taskDetail.description}" /><br />
-        </ui:repeat>
-    </p:column>
+                        <!-- Description Column -->
+                        <p:column headerText="Opis" style="text-align: left;">
+                            <ui:repeat value="#{task.taskDetails}" var="taskDetail">
+                                <h:outputText value="#{taskDetail.description}" /><br />
+                            </ui:repeat>
+                        </p:column>
 
-    <!-- Status Column -->
-    <p:column headerText="Status" style="text-align: center;">
-        <p:selectBooleanCheckbox value="#{taskDetail.completed}"
+                        <!-- Status Column -->
+                        <p:column headerText="Status" style="text-align: center;">
+                           <p:selectBooleanCheckbox value="#{taskDetail.completed}">
+    <f:ajax event="change" listener="#{taskController.toggleTaskCompletion(taskDetail.task.id)}" render="@this :tasksTable statusDialog" />
+</p:selectBooleanCheckbox>
 
-                                 onchange="PF('statusDialog').show();">
-            <f:ajax event="change" listener="#{taskController.toggleTaskCompletion(task.id)}" render="tasksTable" />
-        </p:selectBooleanCheckbox>
-    </p:column>
 
-    <!-- Kolumna z przyciskiem Usuń -->
-    <p:column headerText="Akcja Usuń" style="text-align: center;">
-        <p:commandButton value="Usuń" 
-                         actionListener="#{taskController.deleteTask(task.id)}" 
-                         onclick="return confirm('Czy na pewno chcesz usunąć to zadanie?');" 
-                         update="tasksTable" 
-                         styleClass="btn btn-danger" 
-                         icon="pi pi-trash" />
-    </p:column>
-
-    <!-- Kolumna z przyciskiem Edytuj -->
-<p:column headerText="Akcja Edytuj" style="text-align: center;">
-    <p:commandButton value="Edytuj" 
-                     action="#{taskController.editTask(task.id)}"
-                     styleClass="btn btn-secondary" 
-                     icon="pi pi-pencil" />
+                        </p:column>
+<!-- Category Column -->
+<p:column headerText="Kategoria">
+    <h:outputText value="#{task.category.name}" />
 </p:column>
- 
 
+
+     
+
+                        <!-- Due Date Column -->
+                        <p:column headerText="Termin" style="text-align: center;">
+                            <ui:repeat value="#{task.taskDetails}" var="taskDetail">
+                                <h:outputText value="#{taskDetail.dueDate}">
+                                    <f:convertDateTime pattern="dd-MM-yyyy" />
+                                </h:outputText><br />
+                            </ui:repeat>
+                        </p:column>
+
+                        <!-- Delete Action -->
+                        <p:column headerText="Akcja Usuń" style="text-align: center;">
+                            <p:commandButton value="Usuń" 
+                                             actionListener="#{taskController.deleteTask(task.id)}" 
+                                             onclick="return confirm('Czy na pewno chcesz usunąć to zadanie?');" 
+                                             update="tasksTable" 
+                                             styleClass="primary" />
+                        </p:column>
+
+                        <!-- Edit Action -->
+                   <p:column headerText="Akcja Edytuj" style="text-align: center;">
+                            <p:commandButton value="Edytuj" 
+                                             action="#{taskController.editTask(task.id)}"
+                                             styleClass="primary"/>
+                        </p:column> 
                     </p:dataTable>
 
                     <!-- Add Task Button -->
                     <div style="margin-top: 1em; text-align: right;">
                         <p:commandButton value="Dodaj nowe zadanie" action="addTask.xhtml?faces-redirect=true" 
-                                         styleClass="btn btn-primary" icon="pi pi-plus" />
+                                         styleClass="primary" icon="pi pi-plus" />
                     </div>
 
                 </p:panel>
@@ -104,6 +117,8 @@
         <!-- Sidebar -->
         <ui:include src="sidebar.xhtml" />
     </div>
+
+ 
 
     <!-- Scripts -->
     <h:outputScript name="frontend/assets/js/jquery.min.js" />

@@ -11,16 +11,11 @@ public class CategoryDAO {
 
     @PersistenceContext
     private EntityManager entityManager;
-    
-    // Dodajemy metodę do pobierania wszystkich kategorii
+
+    // Pobieranie wszystkich kategorii
     public List<Category> getAllCategories() {
         return entityManager.createQuery("SELECT c FROM Category c", Category.class)
                             .getResultList();
-    }
-
-    // Pobieranie wszystkich kategorii
-    public List<Category> findAll() {
-        return entityManager.createQuery("SELECT c FROM Category c", Category.class).getResultList();
     }
 
     // Znajdź kategorię po ID

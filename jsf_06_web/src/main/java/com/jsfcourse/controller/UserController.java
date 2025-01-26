@@ -11,6 +11,8 @@ import jakarta.inject.Named;
 import jakarta.validation.constraints.NotEmpty;
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Named
 @SessionScoped
@@ -37,6 +39,11 @@ public class UserController implements Serializable {
     private String confirmNewPassword;
 
     private User loggedInUser;
+    private int pageSize = 5;
+    private int currentPage = 0;
+
+    private List<User> filteredUsers; // Lista przefiltrowanych użytkowników
+    private String filterKeyword; // Zmienna do przechowywania słowa kluczowego do filtrowania
 
     // Gettery i settery
     public String getUsername() {
@@ -54,7 +61,7 @@ public class UserController implements Serializable {
     public void setPassword(String password) {
         this.password = password;
     }
-    
+
     public String getEmail() {
         return email;
     }
@@ -91,7 +98,10 @@ public class UserController implements Serializable {
         return loggedInUser != null;
     }
 
-    // Gettery i settery dla nowych danych
+    public boolean isAdmin() {
+        return loggedInUser != null && "ADMIN".equals(loggedInUser.getRole().name());  // Sprawdzamy, czy rola to ADMIN
+    }
+
     public String getNewPassword() {
         return newPassword;
     }
@@ -106,6 +116,26 @@ public class UserController implements Serializable {
 
     public void setConfirmNewPassword(String confirmNewPassword) {
         this.confirmNewPassword = confirmNewPassword;
+    }
+
+    // Getter i setter dla filterKeyword
+    public String getFilterKeyword() {
+        return filterKeyword;
+    }
+
+    public void setFilterKeyword(String filterKeyword) {
+        this.filterKeyword = filterKeyword;
+    }
+
+    // Metoda filtrowania użytkowników
+    public void filterUsers() {
+        if (filterKeyword != null && !filterKeyword.isEmpty()) {
+            filteredUsers = userDAO.getAllUsers().stream()
+                .filter(user -> user.getUsername().contains(filterKeyword) || user.getEmail().contains(filterKeyword))
+                .collect(Collectors.toList());
+        } else {
+            filteredUsers = userDAO.getAllUsers(); // Jeśli brak filtra, zwracamy wszystkich użytkowników
+        }
     }
 
     // Rejestracja użytkownika
@@ -144,31 +174,25 @@ public class UserController implements Serializable {
         }
     }
 
- // Logowanie użytkownika
+    // Logowanie użytkownika
     public String login() {
         FacesContext context = FacesContext.getCurrentInstance();
-        System.out.println("Zaczynam logowanie...");  // Logowanie do konsoli, aby sprawdzić, czy funkcja jest wywoływana
 
         // Sprawdzamy, czy użytkownik istnieje
         User user = userDAO.findUserByUsername(username);
         if (user != null) {
-            System.out.println("Użytkownik znaleziony");  // Logowanie
             if (password.equals(user.getPassword())) {
                 loggedInUser = user;
-                System.out.println("Zalogowano pomyślnie");  // Logowanie
                 return "home.xhtml?faces-redirect=true"; // Przekierowanie po poprawnym logowaniu
             } else {
-                // Błędne hasło
                 context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Błędne hasło", ""));
                 return null;
             }
         } else {
-            // Użytkownik nie znaleziony
             context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Użytkownik nie znaleziony", ""));
             return null;
         }
     }
-
 
     // Wylogowanie użytkownika
     public String logout() {
@@ -187,7 +211,6 @@ public class UserController implements Serializable {
             return null;
         }
 
-        // Zmieniamy hasło w bazie (hasło pozostaje jako zwykły tekst)
         try {
             loggedInUser.setPassword(newPassword); // Ustawiamy nowe hasło
             userDAO.updateUser(loggedInUser); // Zaktualizuj dane użytkownika w bazie
@@ -199,28 +222,45 @@ public class UserController implements Serializable {
         }
     }
 
-    // Edytowanie danych użytkownika (np. email)
-    public String updateProfile() {
-        FacesContext context = FacesContext.getCurrentInstance();
-
+    // Metoda do pobierania użytkowników
+    public List<User> getUsers() {
         try {
-            // Jeśli nowe hasło zostało wprowadzone i jest zgodne z potwierdzeniem
-            if (newPassword != null && !newPassword.isEmpty() && newPassword.equals(confirmNewPassword)) {
-                loggedInUser.setPassword(newPassword);  // Ustawiamy nowe hasło
+            if (filteredUsers == null) {  // Zmienna filteredUsers będzie przechowywać pobranych użytkowników
+                filteredUsers = userDAO.getAllUsers(); // Pobranie wszystkich użytkowników
             }
-
-            // Aktualizacja e-maila
-            loggedInUser.setEmail(email);
-
-            // Aktualizacja użytkownika w bazie danych
-            userDAO.updateUser(loggedInUser);
-
-            context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Dane zostały zaktualizowane.", ""));
-            return "home.xhtml?faces-redirect=true"; // Powrót na stronę główną
+            return filteredUsers; // Zwrócenie przefiltrowanej listy użytkowników
         } catch (Exception e) {
-            context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Błąd aktualizacji danych: " + e.getMessage(), ""));
+            FacesContext.getCurrentInstance().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Błąd pobierania użytkowników: " + e.getMessage(), ""));
             return null;
         }
     }
-}
+    public void deleteUser(User user) {
+        FacesContext context = FacesContext.getCurrentInstance();
+        
+        try {
+            userDAO.deleteUser(user);  // Usuwamy użytkownika z bazy
+            context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Użytkownik został usunięty.", ""));
+        } catch (Exception e) {
+            context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Błąd usuwania użytkownika: " + e.getMessage(), ""));
+        }
 
+        // Przeładuj listę użytkowników
+        filterUsers();  // Możemy tutaj ponownie zastosować filtrację, jeśli jest aktywna
+    }
+
+    // Getter dla filteredUsers
+    public List<User> getFilteredUsers() {
+        return filteredUsers;
+    }
+    
+    public void previousPage() {
+        if (currentPage > 0) {
+            currentPage--;
+        }
+    }
+
+    public void nextPage() {
+        currentPage++;
+    }
+}

@@ -48,6 +48,7 @@ public class TaskController implements Serializable {
     private List<Category> availableCategories;
     private List<String> availablePriorities;
     private Date selectedDate;
+    
 
     @PostConstruct
     public void init() {
@@ -56,9 +57,11 @@ public class TaskController implements Serializable {
         selectedDate = new Date(); 
         availablePriorities = List.of("Low", "Medium", "High");
         availableCategories = categoryDAO.getAllCategories();
+        category = null; // Reset kategorii
     }
 
     // Gettery i settery
+    
 
     public Date getSelectedDate() {
         return selectedDate;
@@ -89,37 +92,43 @@ public class TaskController implements Serializable {
             return;
         }
 
-        if (taskTitle == null || taskTitle.isEmpty() || selectedPriority == null || category == null) {
+        if (taskTitle == null || taskTitle.isEmpty() || selectedPriority == null || selectedPriority.isEmpty()) {
             FacesContext.getCurrentInstance().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Wszystkie pola są wymagane.", null));
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Wszystkie wymagane pola muszą być wypełnione.", null));
             return;
         }
 
-        // Tworzenie zadania
+        // Tworzenie nowego zadania
         Task newTask = new Task();
         newTask.setTitle(taskTitle);
         newTask.setPriority(selectedPriority);
         newTask.setCreatedAt(new java.sql.Timestamp(System.currentTimeMillis()));
         newTask.setUser(loggedInUser);
-        newTask.setCategory(category);
+
+        // Ustawienie kategorii, jeśli została wybrana
+        if (category != null) {
+            newTask.setCategory(category);
+        }
 
         // Tworzenie szczegółów zadania
-        taskDetail.setDescription(taskDescription); // Dodanie opisu
+        taskDetail.setDescription(taskDescription);
         taskDetail.setCreatedAt(new java.sql.Timestamp(System.currentTimeMillis()));
-        taskDetail.setDueDate(taskDetail.getDueDate()); // Przypisanie terminu
-        taskDetail.setCompleted((byte) 0); // Domyślny status - do wykonania
-        taskDetail.setTask(newTask); // Powiązanie szczegółów z zadaniem
+        taskDetail.setDueDate(selectedDate);
+        taskDetail.setTask(newTask);
 
-        // Zapisanie zadania i szczegółów
+        // Zapisanie zadania i szczegółów w bazie
         taskDAO.saveTask(newTask);
         taskDetailsDAO.save(taskDetail);
 
         // Resetowanie pól formularza
         resetFormFields();
 
-        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Sukces", "Zadanie zostało dodane.");
-        FacesContext.getCurrentInstance().addMessage(null, message);
+        FacesContext.getCurrentInstance().addMessage(null,
+            new FacesMessage(FacesMessage.SEVERITY_INFO, "Sukces", "Zadanie zostało dodane."));
     }
+
+
+
 
     // Resetowanie pól formularza
     private void resetFormFields() {
@@ -165,8 +174,6 @@ public class TaskController implements Serializable {
                 return;
             }
 
-            // Usuń szczegóły powiązane z zadaniem
-            taskDetailsDAO.deleteTaskDetailsByTaskId(taskId);
 
             // Usuń samo zadanie
             taskDAO.deleteTask(task);

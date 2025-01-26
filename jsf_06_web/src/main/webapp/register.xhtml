@@ -9,7 +9,7 @@
 <h:head>
     <meta charset="utf-8" />
     <title>Rejestracja użytkownika</title>
-    <h:outputStylesheet name="css/styles.css" />
+        <h:outputStylesheet name="frontend/assets/css/main.css" />
 </h:head>
 
 <h:body style="background-color: #f0f0f0; margin: 1em;">
@@ -34,7 +34,7 @@
             </h:panelGrid>
 
             <!-- Przycisk rejestracji -->
-            <p:commandButton value="Zarejestruj się" action="#{userController.register}" ajax="false" update="messages" />
+            <p:commandButton value="Zarejestruj się" action="#{userController.register}" ajax="false" update="messages"  styleClass="primary" />
         </h:form>
 
         <!-- Komunikaty o błędach rejestracji -->
